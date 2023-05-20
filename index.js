@@ -2,8 +2,6 @@ const express = require('express')
 const app = express()
 const cors = require('cors');
 require('dotenv').config()
-// educational-toys
-// eWThzqzmyZyyqwiz
 const port = process.env.PORT || 5000;
 
 
@@ -34,6 +32,9 @@ async function run() {
 
 
 
+
+// implement tabe
+
     app.get("/allToy/:tab", async (req, res) => {
       const tab = req.params.tab;
 
@@ -52,7 +53,7 @@ async function run() {
     // ...
 
 
-
+// post toy
     app.post("/postToy", async (req, res) => {
       const body = req.body;
       const result = await productCollection.insertOne(body);
@@ -62,7 +63,7 @@ async function run() {
 
 
 
-
+// get all toy
 
     app.get("/allToy", async (req, res) => {
       console.log(req.query.email);
@@ -78,9 +79,10 @@ async function run() {
     })
 
 
+
+    // delete toy
     app.delete("/allToy/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const quiry = { _id: new ObjectId(id) }
       const product = await productCollection.deleteOne(quiry);
       console.log(product);
@@ -88,9 +90,14 @@ async function run() {
     })
 
 
+
+
+   
+// find specifik toys
+
+
     app.get("/toys/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const quiry = { _id: new ObjectId(id) }
       const result = await productCollection.findOne(quiry)
       res.send(result);
@@ -99,7 +106,29 @@ async function run() {
 
 
 
+ // find search feild
+    app.get("/seacrh/:text", async (req, res) => {
+      try {
+        const text = req.params.text;
+        console.log(text);
+        
+        const result = await productCollection.find({
+          toyName: { $regex: text, $options: "i" }
+        })
+        .limit(20)
+        .toArray();
+    
+        res.send(result);
+      } catch (error) {
+        console.error("Error occurred during search:", error);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+    
 
+
+
+// edit toys
     app.put("/toys/:id", async (req, res) => {
       const id = req.params.id;
       console.log(id);
@@ -114,7 +143,9 @@ async function run() {
           quintity: updated.quintity,
           price: updated.price,
           toyName:updated.toyName,
-          catogory:updated.catogory
+          catogory:updated.catogory,
+          image:updated.image
+
 
         }
       }
