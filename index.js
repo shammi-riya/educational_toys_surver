@@ -78,6 +78,11 @@ async function run() {
 
     })
 
+    app.get("/toysAll",async(req,res)=>{
+      const user = await productCollection.find().limit(20).toArray()
+      res.send(user)
+    })
+
 
 
     // delete toy
@@ -115,7 +120,6 @@ async function run() {
         const result = await productCollection.find({
           toyName: { $regex: text, $options: "i" }
         })
-        .limit(20)
         .toArray();
     
         res.send(result);
@@ -131,8 +135,6 @@ async function run() {
 // edit toys
     app.put("/toys/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
-      console.log(id);
       const filter = { _id: new ObjectId(id) }
       const updated = req.body;
       console.log(updated);
