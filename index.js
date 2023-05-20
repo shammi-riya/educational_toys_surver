@@ -145,7 +145,6 @@ async function run() {
           quintity: updated.quintity,
           price: updated.price,
           toyName:updated.toyName,
-          catogory:updated.catogory,
           image:updated.image
 
 
