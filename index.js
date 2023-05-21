@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const cors = require('cors');
+const { MongoClient, ServerApiVersion, ObjectId, Long } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 5000;
 
@@ -10,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const { MongoClient, ServerApiVersion, ObjectId, Long } = require('mongodb');
+
 const uri = `mongodb+srv://${process.env.USERR_DB}:${process.env.DBB_PASS}@cluster0.f4myxpg.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -25,7 +26,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const productCollection = client.db('educational-toys').collection('toys');
 
@@ -33,7 +34,7 @@ async function run() {
 
 
 
-// implement tabe
+    // implement tabe
 
     app.get("/allToy/:tab", async (req, res) => {
       const tab = req.params.tab;
@@ -53,7 +54,7 @@ async function run() {
     // ...
 
 
-// post toy
+    // post toy
     app.post("/postToy", async (req, res) => {
       const body = req.body;
       const result = await productCollection.insertOne(body);
@@ -63,22 +64,64 @@ async function run() {
 
 
 
-// get all toy
+    // get all toy
 
-    app.get("/allToy", async (req, res) => {
+    app.get("/myToys", async (req, res) => {
       console.log(req.query.email);
       let query = {}
       if (req.query?.email) {
         query = { Useremail: req.query.email }
       }
+
       const result = await productCollection.find(query).toArray();
       res.send(result)
 
+    })
+    app.get("/assending", async (req, res) => {
+      console.log(req.query.email);
+      let query = {}
+      if (req.query?.email) {
+        query = { Useremail:req.query.email }
+      }
 
+      const result = await productCollection.find(query).sort({ price: 1 }).toArray();
+      res.send(result)
+
+    })
+    app.get("/desending", async (req, res) => {
+      console.log(req.query.email);
+      let query = {}
+      if (req.query?.email) {
+        query = { Useremail:req.query.email }
+      }
+
+      const result = await productCollection.find(query).sort({ price: -1 }).toArray();
+      res.send(result)
 
     })
 
-    app.get("/toysAll",async(req,res)=>{
+
+
+
+
+    // app.get('/myToys/:sort', async (req, res) => {
+    //   const sort = req.params.sort;
+    //   console.log(sort);
+
+    //   let sortOrder = 1; // Ascending order by default
+    //   if (sort == 'descending') {
+    //     sortOrder = -1; // Descending order
+    //   } else if (sort == 'assending') {
+    //     sortOrder = 1
+    //   }
+
+    //   const toys = await productCollection.find().sort({ price: sortOrder }).toArray();
+    //   res.json(toys);
+    // });
+
+
+
+    app.get("/toysAll", async (req, res) => {
       const user = await productCollection.find().limit(20).toArray()
       res.send(user)
     })
@@ -97,11 +140,11 @@ async function run() {
 
 
 
-   
-// find specifik toys
+
+    // find specifik toys
 
 
-    app.get("/toys/:id", async (req, res) => {
+    app.get("/toysId/:id", async (req, res) => {
       const id = req.params.id;
       const quiry = { _id: new ObjectId(id) }
       const result = await productCollection.findOne(quiry)
@@ -111,28 +154,28 @@ async function run() {
 
 
 
- // find search feild
+    // find search feild
     app.get("/seacrh/:text", async (req, res) => {
       try {
         const text = req.params.text;
         console.log(text);
-        
+
         const result = await productCollection.find({
           toyName: { $regex: text, $options: "i" }
         })
-        .toArray();
-    
+          .toArray();
+
         res.send(result);
       } catch (error) {
         console.error("Error occurred during search:", error);
         res.status(500).send("Internal Server Error");
       }
     });
-    
 
 
 
-// edit toys
+
+    // edit toys
     app.put("/toys/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) }
@@ -144,8 +187,8 @@ async function run() {
           catogory: updated.catogory,
           quintity: updated.quintity,
           price: updated.price,
-          toyName:updated.toyName,
-          image:updated.image
+          toyName: updated.toyName,
+          image: updated.image
 
 
         }
@@ -155,23 +198,7 @@ async function run() {
     })
 
 
-// asending and desending
-
-
-app.get('/toysAlll/:sort', async (req, res) => {
-  const  sort  = req.params.sort;
-  console.log(sort);
-  
-  let sortOrder = 1; // Ascending order by default
-  if (sort == 'descending') {
-    sortOrder = -1; // Descending order
-  }else if(sort == 'assending'){
-    sortOrder = 1
-  }
-
-  const toys = await productCollection.find().sort({ price: sortOrder }).toArray();
-  res.json(toys);
-});
+    // asending and desending
 
 
 
@@ -183,10 +210,10 @@ app.get('/toysAlll/:sort', async (req, res) => {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
-   
+
     // await client.close();
   }
 }
