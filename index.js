@@ -10,8 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const uri = `mongodb+srv://${process.env.USER_DB}:${process.env.DB_PASS}@cluster0.f4myxpg.mongodb.net/?retryWrites=true&w=majority`;
+const { MongoClient, ServerApiVersion, ObjectId, Long } = require('mongodb');
+const uri = `mongodb+srv://${process.env.USERR_DB}:${process.env.DBB_PASS}@cluster0.f4myxpg.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -153,6 +153,31 @@ async function run() {
       const result = await productCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
+
+
+// asending and desending
+
+
+app.get('/toysAlll/:sort', async (req, res) => {
+  const  sort  = req.params.sort;
+  console.log(sort);
+  
+  let sortOrder = 1; // Ascending order by default
+  if (sort == 'descending') {
+    sortOrder = -1; // Descending order
+  }else if(sort == 'assending'){
+    sortOrder = 1
+  }
+
+  const toys = await productCollection.find().sort({ price: sortOrder }).toArray();
+  res.json(toys);
+});
+
+
+
+
+
+
 
 
 
