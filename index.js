@@ -104,20 +104,6 @@ async function run() {
 
 
 
-    // app.get('/myToys/:sort', async (req, res) => {
-    //   const sort = req.params.sort;
-    //   console.log(sort);
-
-    //   let sortOrder = 1; // Ascending order by default
-    //   if (sort == 'descending') {
-    //     sortOrder = -1; // Descending order
-    //   } else if (sort == 'assending') {
-    //     sortOrder = 1
-    //   }
-
-    //   const toys = await productCollection.find().sort({ price: sortOrder }).toArray();
-    //   res.json(toys);
-    // });
 
 
 
@@ -145,6 +131,13 @@ async function run() {
 
 
     app.get("/toysId/:id", async (req, res) => {
+      const id = req.params.id;
+      const quiry = { _id: new ObjectId(id) }
+      const result = await productCollection.findOne(quiry)
+      res.send(result);
+
+    })
+    app.get("/toysdetails/:id", async (req, res) => {
       const id = req.params.id;
       const quiry = { _id: new ObjectId(id) }
       const result = await productCollection.findOne(quiry)
